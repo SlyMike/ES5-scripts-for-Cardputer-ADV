@@ -1,0 +1,35 @@
+
+// ES5 Bruce JS – Starter Scaffold for Cardputer ADV
+// Verified: Balanced braces, ES5-only, Bruce-safe syntax.
+
+var display = require('display');
+var keyboard = require('keyboard');
+
+var W = display.width(), H = display.height();
+var BG = display.color(0,0,0), WHITE = display.color(255,255,255);
+var running = true;
+
+function setTextEnv(size){ if(display.setTextColor) display.setTextColor(WHITE); if(display.setTextSize) display.setTextSize(size||1); }
+function printAt(x,y,s){ if(display.drawString) display.drawString(s,x,y); else { if(display.setCursor) display.setCursor(x,y); display.print(s);} }
+function clearScreen(c){ display.drawFillRect(0,0,W,H,(c||BG)); }
+
+function handleKeys(){
+  var ks = keyboard.getKeysPressed(); if(!ks||ks.length===0) return;
+  for(var i=0;i<ks.length;i++){
+    var k = ""+ks[i];
+    if(k==="Q"||k==="q"){ running=false; }
+    // Add more key handling here
+  }
+}
+
+// Init
+clearScreen(BG);
+setTextEnv(1);
+printAt(10,10,"Starter Scaffold Loaded");
+
+var frameMs = 45;
+while(running){
+  handleKeys();
+  // Add app logic here
+   delay(frameMs);
+}; // explicit semicolon
