@@ -1,0 +1,78 @@
+
+// ES5 Bruce JS – Starter HUD Scaffold for Cardputer ADV
+// Verified: Balanced braces, ES5-only, Bruce-safe syntax.
+
+var display = require('display');
+var keyboard = require('keyboard');
+var device = require('device');
+var gpio = require('gpio');
+
+var W = display.width(), H = display.height();
+var BG = display.color(0,0,0), WHITE = display.color(255,255,255), ACCENT = display.color(0,180,240);
+var HUDH = 16, TITLEY = 6;
+var running = true, controlsVisible = false;
+var modeStr = "Idle", SHUTTERPIN = 2;
+
+gpio.pinMode(SHUTTERPIN,"output");
+gpio.digitalWrite(SHUTTERPIN,false);
+
+function setTextEnv(size){ if(display.setTextColor) display.setTextColor(WHITE); if(display.setTextSize) display.setTextSize(size||1); }
+function printAt(x,y,s){ if(display.drawString) display.drawString(s,x,y); else { if(display.setCursor) display.setCursor(x,y); display.print(s);} }
+function clearScreen(c){ display.drawFillRect(0,0,W,H,(c||BG)); }
+
+function batteryText(){
+  var p = 0;
+  if(device && typeof device.getBatteryCharge==="function"){ p = device.getBatteryCharge(); }
+  return "Batt:"+p+"%";
+}
+
+function drawBanner(status){
+  clearRect(0,0,W,20,BG);
+  setTextEnv(1);
+  printAt(6,TITLEY,"HUD Scaffold");
+  var wpx = status.length * 6;
+  var x = W - (wpx + 6); if(x<100) x=100;
+  printAt(x,TITLEY,status);
+}
+
+function drawHud(){
+  clearRect(0,H-HUDH,W,HUDH,BG);
+  setTextEnv(1);
+  printAt(6,H-HUDH+2,"Mode:"+modeStr+" GPIO:G"+SHUTTERPIN+" "+batteryText());
+}
+
+function clearRect(x,y,w,h,c){ display.drawFillRect(x,y,w,h,(c||BG)); }
+
+function drawControls(){
+  clearScreen(BG);
+  setTextEnv(1);
+  printAt(10,10,"Controls:");
+  printAt(10,30,"Q = Quit");
+  printAt(10,45,"C = Toggle Controls");
+  printAt(10,60,"G = Cycle GPIO Pin");
+}
+
+function handleKeys(){
+  var ks = keyboard.getKeysPressed(); if(!ks||ks.length===0) return;
+  for(var i=0;i<ks.length;i++){
+    var k = ""+ks[i];
+    if(k==="Q"||k==="q"){ running=false; }
+    if(k==="C"||k==="c"){ controlsVisible=!controlsVisible; clearScreen(BG); if(controlsVisible){ drawControls(); } else { drawBanner("Idle"); drawHud(); }}
+    if(controlsVisible){ continue; }
+    if(k==="G"||k==="g"){ SHUTTERPIN++; if(SHUTTERPIN>4) SHUTTERPIN=1; gpio.digitalWrite(SHUTTERPIN,false); drawHud(); }
+  }
+}
+
+// Init
+clearScreen(BG);
+drawBanner("Idle");
+drawHud();
+
+var frameMs = 45;
+while(running){
+  handleKeys();
+  if(!controlsVisible){
+    // Add app logic here
+   }
+  delay(frameMs);
+}; // explicit semicolon
