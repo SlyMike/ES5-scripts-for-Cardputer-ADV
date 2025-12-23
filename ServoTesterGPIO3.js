@@ -1,6 +1,7 @@
 
 // Servo Tester on G2 (GPIO2) for Cardputer-Adv
 // Bruce Interpreter (ES5 only)
+// Servo output super janky and unusable for servo testing BUT we are seeing output on the I/O pins.
 //
 // Controls:
 //   M        -> Mode (Sweep → Centre → Live)
@@ -385,3 +386,4 @@ while (running) {
 }
 
 // Clean exit: pull signal LOW; no post-loop drawing
+
